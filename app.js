@@ -583,6 +583,11 @@ function renderProgressStats() {
     totalHoursCompleted += userState.completedHours[day];
   }
   
+  const totalHoursValEl = document.getElementById("total-hours-val");
+  if (totalHoursValEl) {
+    totalHoursValEl.innerText = `${totalHoursCompleted.toFixed(1)} hrs`;
+  }
+
   document.getElementById("cumulative-hours-lbl").innerText = `${totalHoursCompleted.toFixed(2)} / ${TARGET_HOURS.toFixed(2)} hrs`;
   
   const completionPercentage = Math.min(100, (totalHoursCompleted / TARGET_HOURS) * 100);
