@@ -438,7 +438,7 @@ let userState = {
 };
 
 // Target study hours limit
-const TARGET_HOURS = 185.0;
+const TARGET_HOURS = 235.5;
 
 function loadState() {
   const savedState = localStorage.getItem("gmat_coach_state");
