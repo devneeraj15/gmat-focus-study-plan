@@ -3,583 +3,223 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GMAT Focus 705+ Study Portal</title>
+  <title>GMAT Daily Focus</title>
   <link rel="stylesheet" href="styles.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <div id="app-layout">
+  <div class="zen-container">
     
-    <!-- Sidebar Navigation -->
-    <aside id="sidebar">
+    <!-- Header -->
+    <header class="zen-header">
       <div class="brand">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-        <h1>GMAT Focus</h1>
-        <span class="brand-badge">705+</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <span>GMAT Focus</span>
       </div>
-      
-      <ul class="nav-menu">
-        <li class="nav-item active" data-tab="dashboard">
-          <button>
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
-            Dashboard
-          </button>
-        </li>
-        <li class="nav-item" data-tab="calendar">
-          <button>
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            Study Calendar
-          </button>
-        </li>
-        <li class="nav-item" data-tab="guides">
-          <button>
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5V4.5z"/></svg>
-            Study Guides
-          </button>
-        </li>
-        <li class="nav-item" data-tab="error-log">
-          <button>
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-            Error Log
-          </button>
-        </li>
-        <li class="nav-item" data-tab="mocks-bootcamps">
-          <button>
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            Mocks & Bootcamps
-          </button>
-        </li>
-        <li class="nav-item" data-tab="exam-ready">
-          <button>
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            Exam Preparation
-          </button>
-        </li>
-      </ul>
-      
-      <div class="sidebar-footer">
-        <button id="theme-toggle" class="btn">
-          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/></svg>
-          Theme Toggle
+      <div id="current-date-lbl" class="date-badge">July 6 | Day 1</div>
+    </header>
+
+    <!-- Main Focus Card -->
+    <main class="zen-card-container">
+      <div class="card focus-card">
+        <div class="focus-badge">TONIGHT'S CHAPTERS</div>
+        
+        <h2 id="focus-title" class="focus-title">Divisibility Practice</h2>
+        <div id="focus-time" class="focus-time">9:00 PM - 11:00 PM</div>
+        
+        <div class="focus-details-box">
+          <div class="detail-row">
+            <span class="detail-label">Resource</span>
+            <span id="focus-resource" class="detail-val">Official Guide Quant #1-20</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Difficulty</span>
+            <span id="focus-difficulty" class="detail-val">Medium</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Instruction</span>
+            <span id="focus-details" class="detail-val">Solve divisibility questions. Focus on identifying prime factor patterns. Log mistakes.</span>
+          </div>
+        </div>
+
+        <!-- Interactive Hour Logger -->
+        <div class="hour-logger">
+          <span class="logger-title">Study Time Logged</span>
+          <div class="stepper">
+            <button class="step-btn" onclick="adjustHours(-0.25)">−</button>
+            <span id="logged-hours-val" class="hours-display">0.00 / 2.00 hrs</span>
+            <button class="step-btn" onclick="adjustHours(0.25)">+</button>
+          </div>
+        </div>
+
+        <!-- Complete Action -->
+        <button id="btn-complete-day" class="btn btn-primary btn-block" onclick="toggleTodayComplete()">
+          Mark Tonight Done
         </button>
-        <button id="btn-export" class="btn btn-secondary">
-          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-          Export Progress
-        </button>
+
+        <!-- Progress Counter Till Aug 22 -->
+        <div class="progress-bar-container">
+          <div class="progress-meta">
+            <span>Cumulative Study</span>
+            <span id="cumulative-hours-lbl">0.00 / 185.00 hrs</span>
+          </div>
+          <div class="progress-track">
+            <div id="cumulative-progress-bar" class="progress-fill" style="width: 0%;"></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-secondary); margin-top:0.25rem;">
+            <span id="days-left-lbl">48 days left</span>
+            <span>Target GMAT: 705+</span>
+          </div>
+        </div>
+
       </div>
-    </aside>
+    </main>
+
+    <!-- Zen Navigation Tabs -->
+    <div class="zen-tabs">
+      <button class="tab-btn" onclick="toggleDrawer('error-form')">📝 Log Error</button>
+      <button class="tab-btn" onclick="toggleDrawer('error-list')">📋 Errors</button>
+      <button class="tab-btn" onclick="toggleDrawer('calendar')">📅 Calendar</button>
+      <button class="tab-btn" onclick="toggleDrawer('settings')">⚙️ Settings</button>
+    </div>
+
+    <!-- ================= DRAWERS (Collapsible/Hidden by default) ================= -->
     
-    <!-- Main Content Area -->
-    <main>
-      <header>
-        <div style="display: flex; align-items: center; gap: 1rem;">
-          <button class="hamburger" id="hamburger-btn">
-            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-          </button>
-          <div class="header-title">
-            <h2 id="current-tab-title">Dashboard</h2>
-            <p id="current-tab-desc">Welcome back, Neeraj. Here is your overview.</p>
-          </div>
-        </div>
-        <div class="header-controls">
-          <div class="card-badge" style="background: rgba(20, 184, 166, 0.1); border-color: rgba(20, 184, 166, 0.3); color: var(--secondary); padding: 0.5rem 1rem;">
-            Days Left: <span id="days-countdown" style="font-weight: 700;">49</span>
-          </div>
-        </div>
-      </header>
-      
-      <!-- ================= DASHBOARD TAB ================= -->
-      <section id="tab-dashboard" class="tab-content active">
-        <!-- Welcoming Hero -->
-        <div class="welcome-hero">
-          <div class="hero-details">
-            <h3>Focus on Today's Goal</h3>
-            <p>You have <strong>49 days</strong> to hit your target GMAT score of <strong>705+</strong>. Balance your remote engineering job at Deloitte with early morning and late night focus blocks.</p>
-          </div>
-          <div class="hero-progress-container">
-            <div class="hero-progress-ring">
-              <svg width="90" height="90">
-                <circle stroke="rgba(255,255,255,0.05)" stroke-width="8" fill="transparent" r="35" cx="45" cy="45" />
-                <circle id="progress-circle" stroke="var(--primary)" stroke-width="8" stroke-dasharray="219.9" stroke-dashoffset="219.9" fill="transparent" r="35" cx="45" cy="45" class="progress-ring-circle" />
-              </svg>
-              <div class="progress-ring-text" id="dash-progress-text" style="font-size: 1.15rem;">0%</div>
-            </div>
-            <div class="hero-progress-labels">
-              <span id="dash-completed-days">0</span> of 49 Days Completed
-            </div>
-          </div>
-        </div>
-        
-        <!-- Row 1: Core Action & Stats -->
-        <div class="grid-2">
-          <!-- Today's Action Plan Card -->
-          <div class="card tip-card" style="display: flex; flex-direction: column; justify-content: space-between;">
-            <div>
-              <h4 class="card-title" style="color: var(--success); margin-bottom: 0.5rem;">
-                Today's Focus
-                <span id="today-day-lbl" style="font-size: 0.8rem; color: var(--text-secondary); font-weight: normal; margin-left: 5px;">Day 1 (Jul 6)</span>
-              </h4>
-              <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem;">Complete your scheduled blocks today to stay on track:</p>
-              <div style="display: flex; flex-direction: column; gap: 0.75rem;" id="today-checklist-container">
-                <!-- Injected via JS -->
-              </div>
-            </div>
-            <button class="btn btn-primary" onclick="switchTab('calendar')" style="margin-top: 1.5rem; align-self: flex-start;">Open Calendar</button>
-          </div>
-          
-          <!-- Key Metrics Panel -->
-          <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
-            <h4 class="card-title">Study Metrics</h4>
-            
-            <div style="display: flex; flex-direction: column; gap: 1rem; margin: 1rem 0;">
-              <div class="metric-row">
-                <span class="metric-label">Hours Invested</span>
-                <span class="metric-val-compact" id="dash-hours">0h</span>
-              </div>
-              <div class="metric-row">
-                <span class="metric-label">Error Log Accuracy</span>
-                <span class="metric-val-compact" id="dash-accuracy">N/A</span>
-              </div>
-              <div class="metric-row">
-                <span class="metric-label">Latest Mock Score</span>
-                <span class="metric-val-compact" id="dash-latest-mock">N/A</span>
-              </div>
-            </div>
-            
-            <div class="focus-areas-container">
-              <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Weakest Subject:</div>
-              <div id="weakest-topic-badge" class="badge-tag label-danger">None Recorded</div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Row 2: Habit tracker (Simple & Compact) -->
-        <div class="card" style="margin-bottom: 1.5rem;">
-          <h4 class="card-title" style="margin-bottom: 0.75rem;">Study Streak Tracker</h4>
-          <div class="habit-grid" id="habit-tracker-grid">
-            <!-- Habit grid items inserted by JS -->
-          </div>
-        </div>
-      </section>
-      
-      <!-- ================= STUDY CALENDAR TAB ================= -->
-      <section id="tab-calendar" class="tab-content">
-        <div class="calendar-filters">
-          <div>
-            <select class="select-input" id="cal-filter-week" onchange="filterCalendar()">
-              <option value="all">Show All Weeks</option>
-              <option value="1">Week 1 (Diagnostic & Concept Foundation)</option>
-              <option value="2">Week 2 (Core Quant & Advanced CR)</option>
-              <option value="3">Week 3 (DI Expansion & RC Drills)</option>
-              <option value="4">Week 4 (Timed Pressure & Advanced DS)</option>
-              <option value="5">Week 5 (Official Material Mastery)</option>
-              <option value="6">Week 6 (Pacing & Section Mocks)</option>
-              <option value="7">Week 7 (Peak Form & Tapering)</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <button class="btn btn-primary" onclick="markAllCalendarCompleted()">Mark All Completed</button>
-            <button class="btn" onclick="resetCalendarProgress()">Reset Progress</button>
-          </div>
-        </div>
-        
-        <div class="weeks-container" id="weeks-container">
-          <!-- Injected via JS -->
-        </div>
-      </section>
-      
-      <!-- ================= STUDY GUIDES TAB (Unified Quant, Verbal, DI) ================= -->
-      <section id="tab-guides" class="tab-content">
-        <div class="guides-tabs-header">
-          <button class="guide-tab-btn active" onclick="switchGuideTab('quant-guide')">Quant Strategy</button>
-          <button class="guide-tab-btn" onclick="switchGuideTab('verbal-guide')">Verbal Strategy</button>
-          <button class="guide-tab-btn" onclick="switchGuideTab('di-guide')">Data Insights</button>
-        </div>
-        
-        <!-- Quant Guide Sub-content -->
-        <div id="quant-guide" class="guide-tab-content active">
-          <div class="card" style="margin-bottom: 1.5rem;">
-            <h3>Quant section (21 Questions | 45 Mins)</h3>
-            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem;">Exclusively Problem Solving. Geometry is removed (basic coordinate geometry properties are retained).</p>
-          </div>
-          
-          <div class="syllabus-grid">
-            <div class="syllabus-item">
-              <h4>Arithmetic & Word Problems</h4>
-              <ul>
-                <li>Percentages, Ratios & Scaling</li>
-                <li>Work, Rate & Time formulas</li>
-                <li>Weighted Averages & Mixtures</li>
-                <li>Fraction & Dividend division</li>
-              </ul>
-            </div>
-            <div class="syllabus-item">
-              <h4>Algebra & Exponents</h4>
-              <ul>
-                <li>Quadratic & Linear Equations</li>
-                <li>Inequalities & Absolute Values</li>
-                <li>Exponent sum rules & Roots rules</li>
-                <li>Coordinate Geometry lines & slopes</li>
-              </ul>
-            </div>
-            <div class="syllabus-item">
-              <h4>Number Properties & Sets</h4>
-              <ul>
-                <li>Prime Factors & Divisibility Rules</li>
-                <li>Odds/Evens & Consecutive Integers</li>
-                <li>Remainders & Modular Arithmetic</li>
-                <li>Overlapping Sets (Venn Diagrams)</li>
-              </ul>
-            </div>
-          </div>
-          
-          <div class="card common-trap-card" style="margin-top: 1.5rem;">
-            <h4 style="color: var(--danger); margin-bottom: 0.5rem;">Quant Trap Guardrails</h4>
-            <ul style="list-style: none; font-size: 0.85rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 0.5rem;">
-              <li>⚠️ <strong>Inequalities sign flips</strong>: Always flip the inequality sign when multiplying/dividing by a negative number.</li>
-              <li>⚠️ <strong>Consecutive sums</strong>: Remember odd/even counts in ranges. For consecutive ranges, count is \(Last - First + 1\).</li>
-              <li>⚠️ <strong>Prime divisors</strong>: Don't guess prime factor counts; map them systematically using factor trees.</li>
-            </ul>
-          </div>
-        </div>
-        
-        <!-- Verbal Guide Sub-content -->
-        <div id="verbal-guide" class="guide-tab-content">
-          <div class="card" style="margin-bottom: 1.5rem;">
-            <h3>Verbal Section (23 Questions | 45 Mins)</h3>
-            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem;">Critical Reasoning (CR) and Reading Comprehension (RC) only. No Sentence Correction.</p>
-          </div>
-          
-          <div class="grid-2">
-            <div class="syllabus-item">
-              <h4>Critical Reasoning (CR) Strategy</h4>
-              <ul>
-                <li><strong>Pre-thinking</strong>: Brainstorm assumptions/gaps before looking at answer options.</li>
-                <li><strong>Role of Bolded Parts</strong>: Categorize lines as evidence, intermediate conclusion, or main conclusion.</li>
-                <li><strong>Common Traps</strong>: Avoid out-of-scope options or answers that weaken when requested to strengthen.</li>
-              </ul>
-            </div>
-            <div class="syllabus-item">
-              <h4>Reading Comprehension (RC) Strategy</h4>
-              <ul>
-                <li><strong>Paragraph Maps</strong>: Briefly summarize the role of each paragraph in 1 sentence while reading.</li>
-                <li><strong>Main Idea</strong>: Identify primary purpose based on passage shifts, not isolated paragraphs.</li>
-                <li><strong>Inference</strong>: Choose options directly supported by text, avoiding assumptions.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        
-        <!-- DI Guide Sub-content -->
-        <div id="di-guide" class="guide-tab-content">
-          <div class="card" style="margin-bottom: 1.5rem;">
-            <h3>Data Insights Section (20 Questions | 45 Mins)</h3>
-            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem;">Integrated section allowing onscreen calculator usage. Blends math and verbal reasoning.</p>
-          </div>
-          
-          <div class="syllabus-grid">
-            <div class="syllabus-item">
-              <h4>Data Sufficiency (DS)</h4>
-              <p style="font-size: 0.8rem; color: var(--text-secondary);">Evaluate statements individually first. Keep variables clear and avoid assumption traps.</p>
-            </div>
-            <div class="syllabus-item">
-              <h4>Table Analysis (TA)</h4>
-              <p style="font-size: 0.8rem; color: var(--text-secondary);">Sort columns systematically to find median, percentage ranges, or ratios. Round values to save time.</p>
-            </div>
-            <div class="syllabus-item">
-              <h4>MSR & Graphics</h4>
-              <p style="font-size: 0.8rem; color: var(--text-secondary);">Index tabs to find relevant details. Read bubble charts, bar graphs, and line graphs meticulously.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-      
-      <!-- ================= ERROR LOG TAB ================= -->
-      <section id="tab-error-log" class="tab-content">
-        <div class="grid-2">
-          <!-- Submission Form -->
-          <div class="card">
-            <h4 class="card-title" style="margin-bottom: 1rem;">Log a Practice Mistake</h4>
-            <form id="error-log-form" onsubmit="addErrorEntry(event)">
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="err-subject">Subject</label>
-                  <select id="err-subject" class="form-control" required onchange="updateTopicDropdown()">
-                    <option value="Quant">Quant</option>
-                    <option value="Verbal">Verbal</option>
-                    <option value="Data Insights">Data Insights</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="err-topic">Topic</label>
-                  <select id="err-topic" class="form-control" required>
-                    <!-- JavaScript populated -->
-                  </select>
-                </div>
-              </div>
-              
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="err-resource">Resource & Question No.</label>
-                  <input type="text" id="err-resource" class="form-control" placeholder="e.g. OG Quant #45" required>
-                </div>
-                <div class="form-group">
-                  <label for="err-mistake-reason">Primary Error Reason</label>
-                  <select id="err-mistake-reason" class="form-control" required>
-                    <option value="Concept Gap">Concept Gap</option>
-                    <option value="Careless Error">Careless Error</option>
-                    <option value="Timing Issue">Timing Issue</option>
-                    <option value="Guess">Educated Guess</option>
-                  </select>
-                </div>
-              </div>
-              
-              <div class="form-group">
-                <label for="err-method">Takeaway & Correct Approach</label>
-                <textarea id="err-method" class="form-control" placeholder="Explain the concept gap or exact steps to solve this correctly in the future." required></textarea>
-              </div>
-              
-              <button type="submit" class="btn btn-primary" style="width: 100%;">Add Entry</button>
-            </form>
-          </div>
-          
-          <!-- Quick stats / filters -->
-          <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
-            <div>
-              <h4 class="card-title">Error Analytics</h4>
-              <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.5rem;">Review logged items periodically (especially on Wednesdays & Sundays) to ensure concepts are mastered.</p>
-              
-              <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 0.75rem;">
-                <span style="font-size: 0.85rem; color: var(--text-secondary);">Frequent Error Reason:</span>
-                <span id="mistake-reason" style="font-weight: 700; color: var(--warning); font-size: 0.9rem;">N/A</span>
-              </div>
-              <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 0.75rem;">
-                <span style="font-size: 0.85rem; color: var(--text-secondary);">Strongest Topic:</span>
-                <span id="strongest-topic-badge" class="badge-tag label-success" style="font-size: 0.8rem;">None</span>
-              </div>
-            </div>
-            
-            <div style="margin-top: 1.5rem;">
-              <label style="font-size:0.8rem; color: var(--text-secondary); display:block; margin-bottom:0.5rem;">Filter Log Table:</label>
-              <select class="select-input" id="table-filter-subject" onchange="renderErrorTable()" style="width: 100%;">
-                <option value="all">Show All Subjects</option>
+    <!-- Drawer: Log Error -->
+    <div id="drawer-error-form" class="drawer">
+      <div class="drawer-header">
+        <h4>Log a Practice Mistake</h4>
+        <button class="close-btn" onclick="closeAllDrawers()">&times;</button>
+      </div>
+      <div class="drawer-body">
+        <form onsubmit="addErrorEntry(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Subject</label>
+              <select id="err-subject" class="form-control" onchange="updateTopicDropdown()">
                 <option value="Quant">Quant</option>
                 <option value="Verbal">Verbal</option>
                 <option value="Data Insights">Data Insights</option>
               </select>
             </div>
-          </div>
-        </div>
-        
-        <!-- Table Log -->
-        <div class="card" style="margin-top: 1.5rem;">
-          <h4 class="card-title">Mistake Database</h4>
-          <div class="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>Subject</th>
-                  <th>Topic</th>
-                  <th>Resource</th>
-                  <th>Error Type</th>
-                  <th>Takeaway</th>
-                  <th>Mastered?</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody id="error-log-tbody">
-                <!-- Javascript Populated -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-      
-      <!-- ================= MOCKS & BOOTCAMPS TAB ================= -->
-      <section id="tab-mocks-bootcamps" class="tab-content">
-        <!-- Mock Tracker Header -->
-        <div class="grid-2">
-          <!-- Mock Chart -->
-          <div class="card">
-            <h4 class="card-title">Official Mock Score Path</h4>
-            <div style="height: 200px; position: relative; width: 100%;">
-              <canvas id="mockChart"></canvas>
-            </div>
-            
-            <form id="mock-score-form" onsubmit="addMockScore(event)" style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1rem; margin-top: 1rem;">
-              <div class="form-row">
-                <div class="form-group">
-                  <select id="mock-num" class="form-control">
-                    <option value="1">Mock 1 (Diagnostic)</option>
-                    <option value="2">Mock 2</option>
-                    <option value="3">Mock 3</option>
-                    <option value="4">Mock 4</option>
-                    <option value="5">Mock 5</option>
-                    <option value="6">Mock 6</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <input type="number" id="mock-score" class="form-control" min="205" max="805" placeholder="Score (e.g. 645)" required>
-                </div>
-              </div>
-              <button type="submit" class="btn btn-primary" style="width: 100%;">Record Score</button>
-            </form>
-          </div>
-          
-          <!-- Bootcamp leave Schedules -->
-          <div class="card">
-            <h4 class="card-title">Leave Bootcamp Schedule</h4>
-            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">For your 6 approved leave days (July 13, 14, Aug 6, 7, 17, 18). Target 8–10 focused hours:</p>
-            
-            <div class="timeline" style="margin-top: 0.5rem; max-height: 280px; overflow-y: auto; padding-right: 5px;">
-              <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                <div class="timeline-content">
-                  <strong>07:00 AM - 09:30 AM (2.5h)</strong>
-                  <p style="font-size: 0.75rem; color: var(--text-secondary);">S1: Hardest math topics (Algebra / Numbers)</p>
-                </div>
-              </div>
-              <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                <div class="timeline-content">
-                  <strong>09:30 AM - 12:00 PM (2.5h)</strong>
-                  <p style="font-size: 0.75rem; color: var(--text-secondary);">S2: Verbal CR & RC timed drills</p>
-                </div>
-              </div>
-              <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                <div class="timeline-content">
-                  <strong>02:00 PM - 04:30 PM (2.5h)</strong>
-                  <p style="font-size: 0.75rem; color: var(--text-secondary);">S3: DI Table Analysis & Graphics</p>
-                </div>
-              </div>
-              <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                <div class="timeline-content">
-                  <strong>05:30 PM - 07:30 PM (2h)</strong>
-                  <p style="font-size: 0.75rem; color: var(--text-secondary);">S4: Error log check & formula updates</p>
-                </div>
-              </div>
+            <div class="form-group">
+              <label>Topic</label>
+              <select id="err-topic" class="form-control">
+                <!-- Javascript populated -->
+              </select>
             </div>
           </div>
-        </div>
-        
-        <!-- Adaptive Coaching Rules -->
-        <div class="card" style="margin-top: 1.5rem;">
-          <h4 class="card-title">Mock Score Calibration Rules</h4>
-          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 0.75rem; font-size: 0.8rem;">
-            <div style="padding: 0.75rem; background: rgba(239, 68, 68, 0.05); border-radius: 8px; border: 1px solid rgba(239,68,68,0.15)">
-              <strong style="color: var(--danger);">Below 625</strong>
-              <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">Watch Magoosh videos. Halve hard practice and master medium OG questions first.</p>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Resource & No.</label>
+              <input type="text" id="err-resource" class="form-control" placeholder="e.g. OG Quant #15" required>
             </div>
-            <div style="padding: 0.75rem; background: rgba(99, 102, 241, 0.05); border-radius: 8px; border: 1px solid rgba(99,102,241,0.15)">
-              <strong style="color: var(--primary);">625–685</strong>
-              <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">Audit careless errors in log. Standardize your CR pre-thinking and algebraic bounds checks.</p>
-            </div>
-            <div style="padding: 0.75rem; background: rgba(16, 185, 129, 0.05); border-radius: 8px; border: 1px solid rgba(16,185,129,0.15)">
-              <strong style="color: var(--success);">Above 685</strong>
-              <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">Work on 700+ GMAT Club problems. Optimize on-screen calculator speed and bookmark timings.</p>
+            <div class="form-group">
+              <label>Mistake Category</label>
+              <select id="err-mistake-reason" class="form-control">
+                <option value="Concept Gap">Concept Gap</option>
+                <option value="Careless Error">Careless Error</option>
+                <option value="Timing Issue">Timing Issue</option>
+                <option value="Guess">Educated Guess</option>
+              </select>
             </div>
           </div>
-        </div>
-      </section>
-      
-      <!-- ================= EXAM PREPARATION TAB (Final Week & Test Day) ================= -->
-      <section id="tab-exam-ready" class="tab-content">
-        <div class="grid-2">
-          <!-- Final Week Plan -->
-          <div class="card">
-            <h4 class="card-title">Final Week Countdown (Aug 19-22)</h4>
-            <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem;">
-              <div class="taper-day">
-                <span class="taper-lbl">Wed, Aug 19</span>
-                <p style="font-size: 0.75rem; color: var(--text-secondary);">15 Quant + 15 Verbal medium official drills. Review formulas.</p>
-              </div>
-              <div class="taper-day">
-                <span class="taper-lbl">Thu, Aug 20</span>
-                <p style="font-size: 0.75rem; color: var(--text-secondary);">15 DI mixed timed drill. Clean Error Log review.</p>
-              </div>
-              <div class="taper-day">
-                <span class="taper-lbl">Fri, Aug 21</span>
-                <p style="font-size: 0.75rem; color: var(--text-secondary);">Formula sheets revision. Arrange IDs and logistics. Sleep early.</p>
-              </div>
-              <div class="taper-day">
-                <span class="taper-lbl" style="background-color: var(--accent-light); color: var(--accent);">Sat, Aug 22</span>
-                <p style="font-size: 0.75rem; color: var(--text-secondary);"><strong>NO STUDYING</strong>. Walk outdoors, hydrate, relax completely.</p>
-              </div>
-            </div>
+          <div class="form-group">
+            <label>Correct Approach / Lesson Learned</label>
+            <textarea id="err-method" class="form-control" placeholder="Write the takeaway to review later..." required></textarea>
           </div>
-          
-          <!-- Exam Day hour by hour -->
-          <div class="card">
-            <h4 class="card-title">Aug 23rd: Exam Day Countdown</h4>
-            <div class="timeline" style="margin-top: 1rem;">
-              <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                <div class="timeline-content">
-                  <strong>06:30 AM: Wake & Warm Up</strong>
-                  <p style="font-size: 0.75rem; color: var(--text-secondary);">Stretch, drink water. Solve 3 easy Quant and 3 easy Verbal warm-up questions (do not grade!).</p>
-                </div>
-              </div>
-              <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                <div class="timeline-content">
-                  <strong>07:15 AM: Power Breakfast</strong>
-                  <p style="font-size: 0.75rem; color: var(--text-secondary);">Slow-release carbs (banana, oats). Pack snack and travel.</p>
-                </div>
-              </div>
-              <div class="timeline-item">
-                <div class="timeline-dot"></div>
-                <div class="timeline-content">
-                  <strong>09:00 AM: EXAM RUN</strong>
-                  <p style="font-size: 0.75rem; color: var(--text-secondary);">Quant (45m) -> Verbal (45m) -> Break (10m) -> DI (45m). Use bookmarking aggressively.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Wednesdays & Sundays revision routines -->
-        <div class="card" style="margin-top: 1.5rem;">
-          <h4 class="card-title">Routine Review Blueprints</h4>
-          <div class="grid-2" style="margin-top: 0.5rem;">
-            <div style="padding: 1rem; background-color: rgba(255,255,255,0.02); border-radius: 10px; border: var(--card-border);">
-              <strong style="color: var(--primary);">Wednesdays (9:00 PM - 11:00 PM)</strong>
-              <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">Re-attempt all errors logged during the week. Check rules on the Formula Sheet.</p>
-            </div>
-            <div style="padding: 1rem; background-color: rgba(255,255,255,0.02); border-radius: 10px; border: var(--card-border);">
-              <strong style="color: var(--secondary);">Sundays (Afternoon block)</strong>
-              <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">Perform mock retrospective, update stats on Dashboard, update flashcard stacks, and clear out un-mastered logs.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-      
-    </main>
-  </div>
-  
-  <!-- Modal Schedule Detail Window -->
-  <div id="schedule-modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-title">
-          <h3 id="modal-day-title">Day X: Topic</h3>
-        </div>
-        <button class="modal-close" onclick="closeModal()">&times;</button>
-      </div>
-      <div class="modal-body" id="modal-day-body">
-        <!-- Injected via JS -->
-      </div>
-      <div class="modal-footer">
-        <div style="display: flex; gap: 10px;">
-          <input type="checkbox" id="modal-chk-complete" style="transform: scale(1.2); cursor: pointer;" onchange="toggleModalDayComplete()">
-          <label for="modal-chk-complete" style="font-weight: 600; cursor: pointer; font-size: 0.9rem;">Mark Completed</label>
-        </div>
-        <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+          <button type="submit" class="btn btn-primary btn-block">Add to Log</button>
+        </form>
       </div>
     </div>
-  </div>
 
+    <!-- Drawer: Errors Database -->
+    <div id="drawer-error-list" class="drawer drawer-large">
+      <div class="drawer-header">
+        <h4>Logged Mistakes</h4>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <select id="table-filter-subject" class="select-input" onchange="renderErrorTable()" style="padding:0.3rem 0.8rem; font-size:0.8rem;">
+            <option value="all">All</option>
+            <option value="Quant">Quant</option>
+            <option value="Verbal">Verbal</option>
+            <option value="Data Insights">Data Insights</option>
+          </select>
+          <button class="close-btn" onclick="closeAllDrawers()">&times;</button>
+        </div>
+      </div>
+      <div class="drawer-body">
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Subject</th>
+                <th>Topic</th>
+                <th>Resource</th>
+                <th>Type</th>
+                <th>Takeaway</th>
+                <th>Mastered?</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="error-log-tbody">
+              <!-- JS populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Drawer: Full Calendar Preview -->
+    <div id="drawer-calendar" class="drawer drawer-large">
+      <div class="drawer-header">
+        <h4>49-Day Study Calendar</h4>
+        <button class="close-btn" onclick="closeAllDrawers()">&times;</button>
+      </div>
+      <div class="drawer-body">
+        <div class="weeks-container" id="weeks-container">
+          <!-- JS populated -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Drawer: Settings / Stats -->
+    <div id="drawer-settings" class="drawer">
+      <div class="drawer-header">
+        <h4>Configurations</h4>
+        <button class="close-btn" onclick="closeAllDrawers()">&times;</button>
+      </div>
+      <div class="drawer-body">
+        <div class="settings-group">
+          <h5>GMAT Mocks Tracker</h5>
+          <div style="height:150px; margin-bottom:1rem; position:relative;">
+            <canvas id="mockChart"></canvas>
+          </div>
+          <form id="mock-score-form" onsubmit="addMockScore(event)" style="display:flex; gap:10px; margin-bottom:1rem;">
+            <select id="mock-num" class="form-control" style="flex:2;">
+              <option value="1">Mock 1</option>
+              <option value="2">Mock 2</option>
+              <option value="3">Mock 3</option>
+              <option value="4">Mock 4</option>
+              <option value="5">Mock 5</option>
+              <option value="6">Mock 6</option>
+            </select>
+            <input type="number" id="mock-score" class="form-control" min="205" max="805" placeholder="Score" required style="flex:2;">
+            <button type="submit" class="btn btn-secondary" style="flex:1;">Log</button>
+          </form>
+        </div>
+        
+        <div class="settings-group" style="margin-top:2rem; border-top:1px solid rgba(255,255,255,0.05); padding-top:1.5rem;">
+          <h5>System Control</h5>
+          <div style="display:flex; flex-direction:column; gap:10px; margin-top:1rem;">
+            <button id="theme-toggle" class="btn btn-block">Toggle Theme</button>
+            <button id="btn-export" class="btn btn-secondary btn-block">Export Study Data</button>
+            <button class="btn btn-block" onclick="resetCalendarProgress()" style="color:var(--danger); border-color:rgba(239,68,68,0.2)">Reset All Progress</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  
   <script src="app.js"></script>
 </body>
 </html>

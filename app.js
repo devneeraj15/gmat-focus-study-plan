@@ -1,4 +1,4 @@
-// GMAT Focus 705+ Interactive Coach - Application Logic (Consolidated Layout)
+// GMAT Focus Daily Zen Portal - Application Logic
 
 // --- 1. DETAILED 49-DAY STUDY CALENDAR DATA ---
 const calendarData = [
@@ -225,7 +225,7 @@ const calendarData = [
     day: 27, date: "Aug 1", type: "weekend", week: 4,
     topic: "Exponents, Roots & CR Evaluate Timed Run",
     sessions: [
-      { time: "08:00 AM - 12:00 PM", title: "Weekend Session 1: Timed Exponents, Roots & Mixture Problems", details: "Attempt a 35-question timed set of exponent manipulation, roots, and mixtures.", resource: "OG Quant Review Book", questions: 35, difficulty: "Medium/Hard", hours: 4.0 },
+      { time: "08:00 AM - 12:00 PM", title: "Weekend Session 1: Timed Exponents, Roots & Mixture Problems", details: "Attempt a timed 35-question set on exponent manipulation, roots, and mixtures.", resource: "OG Quant Review Book", questions: 35, difficulty: "Medium/Hard", hours: 4.0 },
       { time: "03:00 PM - 07:00 PM", title: "Weekend Session 2: Timed RC Passages & DI MSR Practice", details: "Perform a timed set of 4 passages and 2 complete multi-tab MSR questions. Log all errors.", resource: "OG Verbal & OG DI Review", questions: 26, difficulty: "Hard", hours: 4.0 }
     ]
   },
@@ -424,6 +424,7 @@ const calendarData = [
 // --- 2. STATE MANAGEMENT (LOCAL STORAGE) ---
 let userState = {
   completedDays: {},
+  completedHours: {}, // Stores daily completed hours: { [day]: hours }
   errorLog: [],
   mockScores: [
     { mockNum: 1, score: null },
@@ -433,16 +434,20 @@ let userState = {
     { mockNum: 5, score: null },
     { mockNum: 6, score: null }
   ],
-  habits: {},
   theme: "dark"
 };
 
-// Load state from local storage
+// Target study hours limit
+const TARGET_HOURS = 185.0;
+
 function loadState() {
   const savedState = localStorage.getItem("gmat_coach_state");
   if (savedState) {
     try {
       userState = JSON.parse(savedState);
+      if (!userState.completedHours) {
+        userState.completedHours = {};
+      }
       if (!userState.mockScores || userState.mockScores.length < 6) {
         userState.mockScores = [
           { mockNum: 1, score: null },
@@ -459,534 +464,164 @@ function loadState() {
   }
 }
 
-// Save state to local storage
 function saveState() {
   localStorage.setItem("gmat_coach_state", JSON.stringify(userState));
 }
 
-// --- 3. TAB NAVIGATION CONTROL ---
-const tabs = document.querySelectorAll(".nav-item");
-const contents = document.querySelectorAll(".tab-content");
-
-tabs.forEach(tab => {
-  tab.addEventListener("click", () => {
-    const tabName = tab.getAttribute("data-tab");
-    switchTab(tabName);
-  });
-});
-
-function switchTab(tabName) {
-  // Update nav item highlights
-  tabs.forEach(t => t.classList.remove("active"));
-  const activeTab = document.querySelector(`.nav-item[data-tab="${tabName}"]`);
-  if (activeTab) activeTab.classList.add("active");
-  
-  // Toggle tab contents
-  contents.forEach(c => c.classList.remove("active"));
-  const activeContent = document.getElementById(`tab-${tabName}`);
-  if (activeContent) activeContent.classList.add("active");
-  
-  // Scroll to top of main area
-  document.querySelector("main").scrollTop = 0;
-  
-  // Set tab titles
-  const titleMap = {
-    "dashboard": { t: "Dashboard", d: "Welcome back, Neeraj. Here is your overview." },
-    "calendar": { t: "Study Calendar", d: "49-day detailed day-by-day coaching schedule (Jul 6 - Aug 23, 2026)." },
-    "guides": { t: "Study Guides", d: "Unified Quant, Verbal, and Data Insights strategies." },
-    "error-log": { t: "Error Log", d: "Interactive mistake database with learning takeaways." },
-    "mocks-bootcamps": { t: "Mocks & Bootcamps", d: "Official practice tests and intensive leave schedules." },
-    "exam-ready": { t: "Exam Preparation", d: "Final week tapering routines and test day guidelines." }
-  };
-  
-  if (titleMap[tabName]) {
-    document.getElementById("current-tab-title").innerText = titleMap[tabName].t;
-    document.getElementById("current-tab-desc").innerText = titleMap[tabName].d;
-  }
-
-  // Sidebar responsive closing
-  if (window.innerWidth <= 1024) {
-    document.getElementById("sidebar").classList.remove("active");
-  }
-  
-  // Re-run checks/charts if specific tab opened
-  if (tabName === "dashboard") {
-    renderDashboard();
-  } else if (tabName === "calendar") {
-    renderCalendar();
-  } else if (tabName === "mocks-bootcamps") {
-    setTimeout(initMockChart, 100); // Small timeout to ensure DOM renders before sizing chart
-  } else if (tabName === "error-log") {
-    renderErrorTable();
-    updateTopicDropdown();
-  }
-}
-
-// Mobile sidebar hamburger button
-const hamburgerBtn = document.getElementById("hamburger-btn");
-if (hamburgerBtn) {
-  hamburgerBtn.addEventListener("click", () => {
-    document.getElementById("sidebar").classList.add("active");
-  });
-}
-
-// Close sidebar when clicking outside on mobile
-document.addEventListener("click", (e) => {
-  const sidebar = document.getElementById("sidebar");
-  const hamburger = document.getElementById("hamburger-btn");
-  if (sidebar && hamburger && window.innerWidth <= 1024 && !sidebar.contains(e.target) && !hamburger.contains(e.target)) {
-    sidebar.classList.remove("active");
-  }
-});
-
-// --- 4. SUB-TAB GUIDES SWITCHER ---
-function switchGuideTab(guideTabId) {
-  const guideBtns = document.querySelectorAll(".guide-tab-btn");
-  const guideContents = document.querySelectorAll(".guide-tab-content");
-  
-  guideBtns.forEach(b => b.classList.remove("active"));
-  guideContents.forEach(c => c.classList.remove("active"));
-  
-  // Find correct button and content
-  const activeBtn = Array.from(guideBtns).find(b => b.getAttribute("onclick").includes(guideTabId));
-  if (activeBtn) activeBtn.classList.add("active");
-  
-  const activeContent = document.getElementById(guideTabId);
-  if (activeContent) activeContent.classList.add("active");
-}
-
-// --- 5. THEME TOGGLE CONTROL ---
-const themeToggle = document.getElementById("theme-toggle");
-if (themeToggle) {
-  themeToggle.addEventListener("click", () => {
-    const currentTheme = document.documentElement.getAttribute("data-theme");
-    const newTheme = currentTheme === "dark" ? "light" : "dark";
-    document.documentElement.setAttribute("data-theme", newTheme);
-    userState.theme = newTheme;
-    saveState();
-  });
-}
-
-function applyTheme() {
-  document.documentElement.setAttribute("data-theme", userState.theme);
-}
-
-// --- 6. EXPORT/IMPORT STUDY DATA ---
-const btnExport = document.getElementById("btn-export");
-if (btnExport) {
-  btnExport.addEventListener("click", () => {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(userState, null, 2));
-    const downloadAnchor = document.createElement("a");
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `GMAT_Focus_Study_State_${new Date().toISOString().slice(0,10)}.json`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
-  });
-}
-
-// --- 7. RENDER STUDY CALENDAR ---
-const weeksContainer = document.getElementById("weeks-container");
-
-function renderCalendar() {
-  if (!weeksContainer) return;
-  weeksContainer.innerHTML = "";
-  
-  // Group days by weeks
-  const weeks = {};
-  calendarData.forEach(day => {
-    if (!weeks[day.week]) {
-      weeks[day.week] = [];
-    }
-    weeks[day.week].push(day);
-  });
-  
-  // Render week blocks
-  Object.keys(weeks).forEach(weekNum => {
-    const daysInWeek = weeks[weekNum];
-    const isFilteredWeek = document.getElementById("cal-filter-week").value;
-    
-    if (isFilteredWeek !== "all" && isFilteredWeek !== weekNum) {
-      return;
-    }
-    
-    const weekDiv = document.createElement("div");
-    weekDiv.className = "week-section";
-    
-    // Calculate week hours completed
-    let totalWeekHours = 0;
-    let completedWeekHours = 0;
-    daysInWeek.forEach(d => {
-      let dayHours = d.sessions.reduce((sum, s) => sum + s.hours, 0);
-      totalWeekHours += dayHours;
-      if (userState.completedDays[d.day]) {
-        completedWeekHours += dayHours;
-      }
-    });
-    
-    weekDiv.innerHTML = `
-      <div class="week-header">
-        <div class="week-title">Week ${weekNum} - <span style="font-size: 0.8rem; color: var(--text-secondary); font-weight: normal;">${getWeekThemeText(weekNum)}</span></div>
-        <div class="week-stats" style="font-size: 0.8rem; color: var(--text-secondary);">
-          Completed: ${completedWeekHours.toFixed(1)} / ${totalWeekHours.toFixed(1)} hrs (${Math.round((daysInWeek.filter(d => userState.completedDays[d.day]).length / daysInWeek.length) * 100)}%)
-        </div>
-      </div>
-      <div class="days-grid" id="days-grid-w${weekNum}"></div>
-    `;
-    
-    weeksContainer.appendChild(weekDiv);
-    
-    const daysGrid = document.getElementById(`days-grid-w${weekNum}`);
-    
-    daysInWeek.forEach(d => {
-      const isToday = checkIsToday(d.date);
-      const isCompleted = userState.completedDays[d.day];
-      
-      const dayCard = document.createElement("div");
-      dayCard.className = `day-card ${isCompleted ? 'completed' : ''} ${isToday ? 'today' : ''} ${d.type === 'leave' ? 'bootcamp' : ''}`;
-      dayCard.onclick = () => openDayDetails(d.day);
-      
-      dayCard.innerHTML = `
-        <div class="day-header">
-          <span class="day-number">Day ${d.day}</span>
-          <span class="day-date">${d.date}</span>
-        </div>
-        <div class="day-topic">${d.topic}</div>
-        <div class="day-meta">
-          <span class="day-badge">${d.type.toUpperCase()}</span>
-          <span>${d.sessions.reduce((sum, s) => sum + s.hours, 0).toFixed(1)} hrs</span>
-        </div>
-      `;
-      
-      daysGrid.appendChild(dayCard);
-    });
-  });
-}
-
-function getWeekThemeText(week) {
-  const weekThemes = {
-    1: "Diagnostic & Divisibility Properties",
-    2: "Algebra Equations & Inequalities",
-    3: "Ratios, Percentages & RC Paragraph mapping",
-    4: "Exponents, Roots & Multi-tab Data Insights",
-    5: "Statistics & Coordinate Geometry",
-    6: "Probability, Sets & Mock Speed Conditioning",
-    7: "Error Log Re-solve & Test Strategy Calibration"
-  };
-  return weekThemes[week] || "";
-}
-
-function checkIsToday(dateStr) {
+// --- 3. COMPUTE ACTIVE STUDY DAY ---
+function getActiveDayId() {
+  const startDate = new Date("2026-07-06T00:00:00");
   const today = new Date();
-  const options = { month: 'short', day: 'numeric' };
-  const formattedToday = today.toLocaleDateString('en-US', options).replace(',', '');
-  return formattedToday === dateStr || (dateStr === "Jul 6" && today.getFullYear() === 2026);
+  today.setHours(0, 0, 0, 0);
+  startDate.setHours(0, 0, 0, 0);
+  
+  const diffTime = today - startDate;
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+  
+  // Clamp day between 1 and 49
+  return Math.max(1, Math.min(49, diffDays));
 }
 
-function filterCalendar() {
-  renderCalendar();
-}
+let activeDayId = getActiveDayId();
 
-function markAllCalendarCompleted() {
-  calendarData.forEach(d => {
-    userState.completedDays[d.day] = true;
-    userState.habits[d.day] = true;
-  });
-  saveState();
-  renderCalendar();
-  renderDashboard();
-}
-
-function resetCalendarProgress() {
-  if (confirm("Are you sure you want to reset all your progress data, habit logs, mock scores, and error logs? This cannot be undone.")) {
-    userState.completedDays = {};
-    userState.errorLog = [];
-    userState.mockScores = [
-      { mockNum: 1, score: null },
-      { mockNum: 2, score: null },
-      { mockNum: 3, score: null },
-      { mockNum: 4, score: null },
-      { mockNum: 5, score: null },
-      { mockNum: 6, score: null }
-    ];
-    userState.habits = {};
-    saveState();
-    renderCalendar();
-    renderDashboard();
-    alert("Progress has been fully reset.");
-  }
-}
-
-// --- 8. MODAL PLAN DETAIL WINDOW ---
-let activeDayId = null;
-
-function openDayDetails(dayNum) {
-  activeDayId = dayNum;
-  const d = calendarData.find(day => day.day === dayNum);
+// --- 4. RENDER ACTIVE TONIGHT'S SESSION ---
+function renderActiveDay() {
+  const d = calendarData.find(day => day.day === activeDayId);
   if (!d) return;
   
-  document.getElementById("modal-day-title").innerText = `Day ${d.day} (${d.date}): ${d.topic}`;
+  // Update header details
+  document.getElementById("current-date-lbl").innerText = `${d.date} | Day ${d.day}`;
   
-  const body = document.getElementById("modal-day-body");
-  body.innerHTML = "";
+  // Tonight's focus session: Usually the second session (night slot) or the core weekend session
+  let tonightSession = d.sessions[d.sessions.length - 1]; // Fallback to last session
+  let workdayNight = d.sessions.find(s => s.time.includes("PM"));
+  if (workdayNight) {
+    tonightSession = workdayNight;
+  }
   
-  d.sessions.forEach((s, idx) => {
-    const isNight = s.time.includes("PM");
-    const block = document.createElement("div");
-    block.className = `session-block ${isNight ? 'night' : ''}`;
-    
-    block.innerHTML = `
-      <div class="session-time">${s.time}</div>
-      <div class="session-title">${s.title}</div>
-      <div class="session-details">${s.details}</div>
-      <div class="session-meta-grid">
-        <div>Resource: <strong>${s.resource}</strong></div>
-        <div>Questions: <strong>${s.questions > 0 ? s.questions : 'None/Concept'}</strong></div>
-        <div>Difficulty: <strong>${s.difficulty}</strong></div>
-        <div>Est. Time: <strong>${s.hours} hrs</strong></div>
-      </div>
-    `;
-    
-    body.appendChild(block);
-  });
+  document.getElementById("focus-title").innerText = d.topic;
+  document.getElementById("focus-time").innerText = tonightSession.time;
+  document.getElementById("focus-resource").innerText = tonightSession.resource;
+  document.getElementById("focus-difficulty").innerText = tonightSession.difficulty;
+  document.getElementById("focus-details").innerText = tonightSession.details;
   
-  document.getElementById("modal-chk-complete").checked = !!userState.completedDays[d.day];
-  document.getElementById("schedule-modal").style.display = "flex";
+  // Initialize default hours in state if not set
+  const targetSessionHours = tonightSession.hours;
+  if (userState.completedHours[d.day] === undefined) {
+    userState.completedHours[d.day] = userState.completedDays[d.day] ? targetSessionHours : 0.0;
+  }
+  
+  updateHoursUI(targetSessionHours);
 }
 
-function closeModal() {
-  document.getElementById("schedule-modal").style.display = "none";
+function updateHoursUI(target) {
+  const logged = userState.completedHours[activeDayId] || 0.0;
+  document.getElementById("logged-hours-val").innerText = `${logged.toFixed(2)} / ${target.toFixed(2)} hrs`;
+  
+  // Toggle complete button layout
+  const btn = document.getElementById("btn-complete-day");
+  if (userState.completedDays[activeDayId]) {
+    btn.innerText = "Completed! Reset Tonight";
+    btn.className = "btn btn-secondary btn-block";
+  } else {
+    btn.innerText = "Mark Tonight Done";
+    btn.className = "btn btn-primary btn-block";
+  }
+  
+  // Update total progress bar
+  renderProgressStats();
 }
 
-function toggleModalDayComplete() {
-  if (activeDayId === null) return;
-  const isChecked = document.getElementById("modal-chk-complete").checked;
+// --- 5. INTERACTIVE HOUR STEPPER ---
+function adjustHours(amount) {
+  const d = calendarData.find(day => day.day === activeDayId);
+  if (!d) return;
   
-  if (isChecked) {
+  let currentHours = userState.completedHours[activeDayId] || 0.0;
+  currentHours = Math.max(0, currentHours + amount);
+  userState.completedHours[activeDayId] = currentHours;
+  
+  // Auto-mark completed if study hours are logged
+  if (currentHours > 0) {
     userState.completedDays[activeDayId] = true;
-    userState.habits[activeDayId] = true;
   } else {
     delete userState.completedDays[activeDayId];
-    delete userState.habits[activeDayId];
   }
   
   saveState();
-  renderCalendar();
-  renderDashboard();
+  let tonightSession = d.sessions.find(s => s.time.includes("PM")) || d.sessions[d.sessions.length - 1];
+  updateHoursUI(tonightSession.hours);
+  renderCalendarGrid();
 }
 
-// --- 9. DASHBOARD CALCULATIONS & RENDERING ---
-function renderDashboard() {
-  loadState();
-  applyTheme();
+function toggleTodayComplete() {
+  const d = calendarData.find(day => day.day === activeDayId);
+  if (!d) return;
+  
+  let tonightSession = d.sessions.find(s => s.time.includes("PM")) || d.sessions[d.sessions.length - 1];
+  const isCompleted = userState.completedDays[activeDayId];
+  
+  if (isCompleted) {
+    // Reset complete status
+    delete userState.completedDays[activeDayId];
+    userState.completedHours[activeDayId] = 0.0;
+  } else {
+    // Complete status
+    userState.completedDays[activeDayId] = true;
+    userState.completedHours[activeDayId] = tonightSession.hours;
+  }
+  
+  saveState();
+  updateHoursUI(tonightSession.hours);
+  renderCalendarGrid();
+}
+
+// --- 6. PROGRESS STATS CALCULATIONS ---
+function renderProgressStats() {
+  let totalHoursCompleted = 0.0;
+  for (let day in userState.completedHours) {
+    totalHoursCompleted += userState.completedHours[day];
+  }
+  
+  document.getElementById("cumulative-hours-lbl").innerText = `${totalHoursCompleted.toFixed(2)} / ${TARGET_HOURS.toFixed(2)} hrs`;
+  
+  const completionPercentage = Math.min(100, (totalHoursCompleted / TARGET_HOURS) * 100);
+  document.getElementById("cumulative-progress-bar").style.width = `${completionPercentage}%`;
   
   // Days Countdown Calculation
   const examDate = new Date("2026-08-23T09:00:00");
   const today = new Date();
   const timeDiff = examDate - today;
   const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+  document.getElementById("days-left-lbl").innerText = `${daysDiff > 0 ? daysDiff : 0} days remaining`;
+}
+
+// --- 7. COLLAPSIBLE DRAWERS CONTROL ---
+function toggleDrawer(drawerId) {
+  const targetDrawer = document.getElementById(`drawer-${drawerId}`);
+  const isOpen = targetDrawer.classList.contains("active");
   
-  const daysCountdown = document.getElementById("days-countdown");
-  if (daysCountdown) daysCountdown.innerText = daysDiff > 0 ? daysDiff : 0;
+  closeAllDrawers();
   
-  // Progress calculations
-  const totalDays = calendarData.length;
-  const completedCount = Object.keys(userState.completedDays).length;
-  const completionPercentage = totalDays > 0 ? Math.round((completedCount / totalDays) * 100) : 0;
-  
-  const dashCompletedDays = document.getElementById("dash-completed-days");
-  if (dashCompletedDays) dashCompletedDays.innerText = completedCount;
-  
-  // Circular progress ring stroke calculation
-  const circle = document.getElementById("progress-circle");
-  if (circle) {
-    const circumference = 35 * 2 * Math.PI; // radius is 35
-    circle.style.strokeDasharray = `${circumference} ${circumference}`;
-    const offset = circumference - (completionPercentage / 100) * circumference;
-    circle.style.strokeDashoffset = offset;
-  }
-  
-  const progressText = document.getElementById("dash-progress-text");
-  if (progressText) progressText.innerText = `${completionPercentage}%`;
-  
-  // Total Study Hours calculation
-  let totalHoursCompleted = 0;
-  calendarData.forEach(d => {
-    if (userState.completedDays[d.day]) {
-      totalHoursCompleted += d.sessions.reduce((sum, s) => sum + s.hours, 0);
-    }
-  });
-  
-  const dashHours = document.getElementById("dash-hours");
-  if (dashHours) dashHours.innerText = `${totalHoursCompleted.toFixed(1)}h`;
-  
-  // Latest Mock Score rendering
-  const scoresLogged = userState.mockScores.filter(s => s.score !== null);
-  const latestMockEl = document.getElementById("dash-latest-mock");
-  if (latestMockEl) {
-    if (scoresLogged.length > 0) {
-      const latest = scoresLogged[scoresLogged.length - 1];
-      latestMockEl.innerText = latest.score;
-    } else {
-      latestMockEl.innerText = "N/A";
+  if (!isOpen) {
+    targetDrawer.classList.add("active");
+    if (drawerId === "calendar") {
+      renderCalendarGrid();
+    } else if (drawerId === "error-list") {
+      renderErrorTable();
+    } else if (drawerId === "settings") {
+      setTimeout(initMockChart, 150); // Delay for DOM layouts
+    } else if (drawerId === "error-form") {
+      updateTopicDropdown();
     }
   }
-  
-  // Error Log metrics calculations
-  const weakestBadge = document.getElementById("weakest-topic-badge");
-  const strongestBadge = document.getElementById("strongest-topic-badge");
-  const mistakeReason = document.getElementById("mistake-reason");
-  const dashAccuracy = document.getElementById("dash-accuracy");
-  
-  if (userState.errorLog.length > 0) {
-    const totalErrors = userState.errorLog.length;
-    const masteredCount = userState.errorLog.filter(e => e.mastered).length;
-    const accuracy = Math.round((masteredCount / totalErrors) * 100);
-    
-    if (dashAccuracy) dashAccuracy.innerText = `${accuracy}%`;
-    
-    // Topic aggregation for Weakest & Strongest
-    const topicStats = {};
-    const reasonStats = {};
-    
-    userState.errorLog.forEach(item => {
-      if (!topicStats[item.topic]) {
-        topicStats[item.topic] = { total: 0, mastered: 0 };
-      }
-      topicStats[item.topic].total++;
-      if (item.mastered) {
-        topicStats[item.topic].mastered++;
-      }
-      
-      if (!reasonStats[item.reason]) {
-        reasonStats[item.reason] = 0;
-      }
-      reasonStats[item.reason]++;
-    });
-    
-    let weakestTopic = "None";
-    let lowestRatio = 1.1;
-    let strongestTopic = "None";
-    let highestRatio = -0.1;
-    
-    Object.keys(topicStats).forEach(t => {
-      const stats = topicStats[t];
-      const ratio = stats.mastered / stats.total;
-      
-      if (ratio < lowestRatio) {
-        lowestRatio = ratio;
-        weakestTopic = t;
-      }
-      if (ratio >= highestRatio) {
-        highestRatio = ratio;
-        strongestTopic = t;
-      }
-    });
-    
-    let primaryReason = "N/A";
-    let maxReasonCount = 0;
-    Object.keys(reasonStats).forEach(r => {
-      if (reasonStats[r] > maxReasonCount) {
-        maxReasonCount = reasonStats[r];
-        primaryReason = r;
-      }
-    });
-    
-    if (weakestBadge) weakestBadge.innerText = weakestTopic;
-    if (strongestBadge) strongestBadge.innerText = strongestTopic;
-    if (mistakeReason) mistakeReason.innerText = primaryReason;
-  } else {
-    if (dashAccuracy) dashAccuracy.innerText = "N/A";
-    if (weakestBadge) weakestBadge.innerText = "None Recorded";
-    if (strongestBadge) strongestBadge.innerText = "None";
-    if (mistakeReason) mistakeReason.innerText = "N/A";
-  }
-  
-  renderHabitsGrid();
-  renderTodayChecklist();
 }
 
-function renderHabitsGrid() {
-  const grid = document.getElementById("habit-tracker-grid");
-  if (!grid) return;
-  grid.innerHTML = "";
-  
-  for (let i = 1; i <= 49; i++) {
-    const block = document.createElement("div");
-    const isCompleted = !!userState.habits[i];
-    block.className = `habit-day ${isCompleted ? 'completed' : ''}`;
-    block.title = `Day ${i}: ${isCompleted ? 'Completed' : 'Not completed'}`;
-    block.innerText = i;
-    block.onclick = () => {
-      if (userState.habits[i]) {
-        delete userState.habits[i];
-        delete userState.completedDays[i];
-      } else {
-        userState.habits[i] = true;
-        userState.completedDays[i] = true;
-      }
-      saveState();
-      renderDashboard();
-    };
-    grid.appendChild(block);
-  }
+function closeAllDrawers() {
+  document.querySelectorAll(".drawer").forEach(d => d.classList.remove("active"));
 }
 
-function renderTodayChecklist() {
-  const container = document.getElementById("today-checklist-container");
-  if (!container) return;
-  container.innerHTML = "";
-  
-  let currentDay = calendarData[0];
-  const today = new Date();
-  
-  for (let i = 0; i < calendarData.length; i++) {
-    const d = calendarData[i];
-    const isToday = checkIsToday(d.date);
-    if (isToday) {
-      currentDay = d;
-      break;
-    }
-  }
-  
-  const todayDayLbl = document.getElementById("today-day-lbl");
-  if (todayDayLbl) todayDayLbl.innerText = `Day ${currentDay.day} (${currentDay.date})`;
-  
-  currentDay.sessions.forEach((s, idx) => {
-    const item = document.createElement("div");
-    item.className = "checklist-item";
-    
-    const isChecked = !!userState.completedDays[currentDay.day];
-    
-    item.innerHTML = `
-      <input type="checkbox" id="chk-today-${idx}" style="cursor:pointer;" ${isChecked ? 'checked' : ''} onchange="toggleTodayCheck(${currentDay.day})">
-      <label for="chk-today-${idx}" style="cursor:pointer; font-size:0.8rem; line-height: 1.3;">
-        <strong>${s.time}</strong>: ${s.title} (${s.resource})
-      </label>
-    `;
-    container.appendChild(item);
-  });
-}
-
-function toggleTodayCheck(dayNum) {
-  const checkBoxes = document.querySelectorAll(`[id^="chk-today-"]`);
-  let allChecked = true;
-  checkBoxes.forEach(c => {
-    if (!c.checked) allChecked = false;
-  });
-  
-  if (allChecked) {
-    userState.completedDays[dayNum] = true;
-    userState.habits[dayNum] = true;
-  } else {
-    delete userState.completedDays[dayNum];
-    delete userState.habits[dayNum];
-  }
-  saveState();
-  renderDashboard();
-}
-
-// --- 10. ERROR LOG LOGIC ---
+// --- 8. RENDER ERROR LOG FORM & TABLE ---
 const topicsBySubject = {
   "Quant": ["Arithmetic", "Number Properties", "Algebra", "Ratios", "Percentages", "Fractions", "Decimals", "Exponents", "Roots", "Word Problems", "Statistics", "Probability", "Geometry", "Coordinate Geometry"],
   "Verbal": ["Critical Reasoning", "Reading Comprehension"],
@@ -1034,9 +669,9 @@ function addErrorEntry(e) {
   document.getElementById("err-resource").value = "";
   document.getElementById("err-method").value = "";
   
-  renderErrorTable();
-  renderDashboard();
-  alert("Error entry added!");
+  closeAllDrawers();
+  toggleDrawer("error-list");
+  alert("Mistake logged!");
 }
 
 function renderErrorTable() {
@@ -1052,7 +687,7 @@ function renderErrorTable() {
   });
   
   if (filteredLog.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-secondary);">No mistakes logged yet. Keep it up!</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-secondary); padding:2rem 0;">No errors recorded yet. Good job!</td></tr>`;
     return;
   }
   
@@ -1066,11 +701,11 @@ function renderErrorTable() {
       <td><span class="badge ${subjectBadge}">${item.subject}</span></td>
       <td style="font-weight:600;">${item.topic}</td>
       <td>${item.resource}</td>
-      <td><span style="color:var(--warning); font-size:0.75rem;">${item.reason}</span></td>
-      <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${item.method}">${item.method}</td>
+      <td><span style="color:var(--warning); font-size:0.7rem;">${item.reason}</span></td>
+      <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${item.method}">${item.method}</td>
       <td>
         <input type="checkbox" ${item.mastered ? 'checked' : ''} onchange="toggleErrorMastery(${item.id})" class="status-switch">
-        <span style="font-size:0.75rem; color:${item.mastered ? 'var(--success)' : 'var(--danger)'}; font-weight:600; margin-left:4px;">
+        <span style="font-size:0.7rem; color:${item.mastered ? 'var(--success)' : 'var(--danger)'}; font-weight:600; margin-left:3px;">
           ${item.mastered ? 'Yes' : 'No'}
         </span>
       </td>
@@ -1090,20 +725,79 @@ function toggleErrorMastery(id) {
     item.mastered = !item.mastered;
     saveState();
     renderErrorTable();
-    renderDashboard();
   }
 }
 
 function deleteErrorEntry(id) {
-  if (confirm("Are you sure you want to delete this mistake?")) {
+  if (confirm("Delete this log entry?")) {
     userState.errorLog = userState.errorLog.filter(e => e.id !== id);
     saveState();
     renderErrorTable();
-    renderDashboard();
   }
 }
 
-// --- 11. MOCK TEST TRACKER CHART ---
+// --- 9. RENDER CALENDAR GRID DRAWERS ---
+function renderCalendarGrid() {
+  const container = document.getElementById("weeks-container");
+  if (!container) return;
+  container.innerHTML = "";
+  
+  const weeks = {};
+  calendarData.forEach(day => {
+    if (!weeks[day.week]) weeks[day.week] = [];
+    weeks[day.week].push(day);
+  });
+  
+  Object.keys(weeks).forEach(weekNum => {
+    const daysInWeek = weeks[weekNum];
+    const weekDiv = document.createElement("div");
+    weekDiv.className = "week-section";
+    
+    weekDiv.innerHTML = `
+      <div class="week-header">
+        <span>Week ${weekNum}</span>
+        <span>${getWeekThemeText(weekNum)}</span>
+      </div>
+      <div class="days-grid" id="days-grid-w${weekNum}"></div>
+    `;
+    container.appendChild(weekDiv);
+    
+    const daysGrid = document.getElementById(`days-grid-w${weekNum}`);
+    
+    daysInWeek.forEach(d => {
+      const isCompleted = !!userState.completedDays[d.day];
+      const isToday = d.day === activeDayId;
+      
+      const dayBlock = document.createElement("div");
+      dayBlock.className = `day-card ${isCompleted ? 'completed' : ''} ${isToday ? 'today' : ''} ${d.type === 'leave' ? 'bootcamp' : ''}`;
+      dayBlock.innerText = d.day;
+      dayBlock.title = `Day ${d.day} (${d.date}): ${d.topic}`;
+      
+      dayBlock.onclick = () => {
+        activeDayId = d.day;
+        renderActiveDay();
+        closeAllDrawers();
+      };
+      
+      daysGrid.appendChild(dayBlock);
+    });
+  });
+}
+
+function getWeekThemeText(week) {
+  const weekThemes = {
+    1: "Divisibility Rules & Prime Arithmetic",
+    2: "Algebra Equations & Inequalities",
+    3: "Ratios, Percentages & RC Paragraph mapping",
+    4: "Exponents, Roots & Multi-tab Data Insights",
+    5: "Statistics & Coordinate Geometry",
+    6: "Probability, Sets & Mock Speed Conditioning",
+    7: "Error Log Re-solve & Test Strategy Calibration"
+  };
+  return weekThemes[week] || "";
+}
+
+// --- 10. MOCK TEST TRACKER CHART ---
 let mockChartInstance = null;
 
 function initMockChart() {
@@ -1133,18 +827,17 @@ function initMockChart() {
           data: scores,
           borderColor: '#6366f1',
           backgroundColor: 'rgba(99, 102, 241, 0.1)',
-          borderWidth: 2.5,
+          borderWidth: 2,
           tension: 0.25,
           pointBackgroundColor: '#14b8a6',
-          pointBorderColor: '#fff',
-          pointRadius: 5,
+          pointRadius: 4,
           spanGaps: true
         },
         {
           label: 'Target (705+)',
           data: [705, 705, 705, 705, 705, 705],
-          borderColor: 'rgba(236, 72, 153, 0.4)',
-          borderWidth: 1.5,
+          borderColor: 'rgba(236, 72, 153, 0.3)',
+          borderWidth: 1,
           borderDash: [5, 5],
           fill: false,
           pointRadius: 0
@@ -1159,16 +852,16 @@ function initMockChart() {
           min: 500,
           max: 805,
           grid: { color: 'rgba(255, 255, 255, 0.02)' },
-          ticks: { color: '#8e95a5', font: { size: 10 } }
+          ticks: { color: '#878f9e', font: { size: 9 } }
         },
         x: {
           grid: { color: 'rgba(255, 255, 255, 0.02)' },
-          ticks: { color: '#8e95a5', font: { size: 10 } }
+          ticks: { color: '#878f9e', font: { size: 9 } }
         }
       },
       plugins: {
         legend: {
-          labels: { color: '#f3f4f6', font: { size: 10 } }
+          labels: { color: '#f3f4f6', font: { size: 9 } }
         }
       }
     }
@@ -1186,10 +879,59 @@ function addMockScore(e) {
     item.score = score;
     saveState();
     initMockChart();
-    renderDashboard();
     
     document.getElementById("mock-score").value = "";
-    alert(`Mock ${mockNum} score saved!`);
+    alert(`Mock ${mockNum} score updated!`);
+  }
+}
+
+// --- 11. EXPORT & SYSTEM CONTROL ---
+const btnExport = document.getElementById("btn-export");
+if (btnExport) {
+  btnExport.addEventListener("click", () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(userState, null, 2));
+    const downloadAnchor = document.createElement("a");
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", `GMAT_Focus_Study_State_${new Date().toISOString().slice(0,10)}.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+  });
+}
+
+const themeToggle = document.getElementById("theme-toggle");
+if (themeToggle) {
+  themeToggle.addEventListener("click", () => {
+    const currentTheme = document.documentElement.getAttribute("data-theme");
+    const newTheme = currentTheme === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", newTheme);
+    userState.theme = newTheme;
+    saveState();
+  });
+}
+
+function applyTheme() {
+  document.documentElement.setAttribute("data-theme", userState.theme);
+}
+
+function resetCalendarProgress() {
+  if (confirm("Reset all study progress, error logs, and hour trackers? This cannot be undone.")) {
+    userState.completedDays = {};
+    userState.completedHours = {};
+    userState.errorLog = [];
+    userState.mockScores = [
+      { mockNum: 1, score: null },
+      { mockNum: 2, score: null },
+      { mockNum: 3, score: null },
+      { mockNum: 4, score: null },
+      { mockNum: 5, score: null },
+      { mockNum: 6, score: null }
+    ];
+    saveState();
+    activeDayId = getActiveDayId();
+    renderActiveDay();
+    closeAllDrawers();
+    alert("Reset completed!");
   }
 }
 
@@ -1197,5 +939,5 @@ function addMockScore(e) {
 window.onload = function() {
   loadState();
   applyTheme();
-  renderDashboard();
+  renderActiveDay();
 };
